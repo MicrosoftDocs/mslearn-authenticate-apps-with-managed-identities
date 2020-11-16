@@ -1,35 +1,30 @@
-﻿using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Azure.KeyVault;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 
 namespace secretapp
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            AzureServiceTokenProvider azureServiceTokenProvider = new AzureServiceTokenProvider();
-            GetSecretFromKeyVault(azureServiceTokenProvider).Wait();
+            await GetSecretFromKeyVault().ConfigureAwait(false);
         }
 
-        private static async Task GetSecretFromKeyVault(AzureServiceTokenProvider azureServiceTokenProvider)
+        private static async Task GetSecretFromKeyVault()
         {
-            KeyVaultClient keyVaultClient =
-                new KeyVaultClient(
-                    new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-
             var keyVaultName = "<key vault name>";
             var keyVaultSecretName = "<secret name>";
+            Uri keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net");
+
+            SecretClient secretClient = new SecretClient(keyVaultUri, new DefaultAzureCredential());
 
             try
             {
-                var secret = await keyVaultClient
-                    .GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{keyVaultSecretName}")
-                    .ConfigureAwait(false);
+                var secret = await secretClient.GetSecretAsync(keyVaultSecretName).ConfigureAwait(false);
 
                 Console.WriteLine($"Secret: {secret.Value}");
-
             }
             catch (Exception exp)
             {
