@@ -15,11 +15,12 @@ namespace secretapp
         private static async Task GetSecretFromKeyVault()
         {
             var keyVaultName = "<key vault name>";
-            var keyVaultSecretName = "<secret name>";
             Uri keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net");
 
             SecretClient secretClient = new SecretClient(keyVaultUri, new DefaultAzureCredential());
 
+            var keyVaultSecretName = "<secret name>";
+            
             try
             {
                 var secret = await secretClient.GetSecretAsync(keyVaultSecretName).ConfigureAwait(false);
