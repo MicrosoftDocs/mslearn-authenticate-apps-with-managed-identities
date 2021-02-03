@@ -23,7 +23,7 @@ namespace secretapp
             
             try
             {
-                var secret = await secretClient.GetSecretAsync(keyVaultSecretName).ConfigureAwait(false);
+                KeyVaultSecret secret = await secretClient.GetSecretAsync(keyVaultSecretName).ConfigureAwait(false);
 
                 Console.WriteLine($"Secret: {secret.Value}");
             }
